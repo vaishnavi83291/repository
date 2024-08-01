@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('SAST') {
+            steps {
+                 script {
+                    try {
+                        bat 'D:/snyk/snyk-win.exe code test D:/snyk/wrongsecrets-master >> D:/snyk/Git_snyk_pipeline3.txt'
+                    } catch (Exception e) {
+                        echo Snyk test failed, but build continues
+                    }
+                 }
+            }
+       }
+        stage('Deppendency check') {
+            steps {
+               bat 'D:/Dependency_Checker/dependency-check-10.0.1-release/dependency-check/bin/dependency-check.bat --project dep_chaeck --scan D:/wrongsecrets-master.zip --out D:/Project/depcheck3.html'
+            }
+        }
+        stage('DAST') {
+            steps {
+                bat'java -jar C:/Users/Vaishnavi/Downloads/ZAP_2.15.0_Core/ZAP_2.15.0/zap-2.15.0.jar -cmd -silent -quickurl https://demo.owasp-juice.shop/#/ -quickout D:/Project/juiceshop_pipeline.html -quickprogress -port 8081'
+            }
+        } 
+    }
+}
